@@ -5,7 +5,6 @@ import com.kitsune.tech.library.data.api.models.BookDoc
 import com.kitsune.tech.library.data.api.models.WorkDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Date
 
 class BookRepository(private val bookDao: BookDao) {
     private val api = RetrofitInstance.api
@@ -72,11 +71,11 @@ class BookRepository(private val bookDao: BookDao) {
             author = author,
             description = "Published in ${this.firstPublishYear ?: "Unknown"}",
             genre = genre,
-            coverImageUrl = coverUrl,
+            coverImageUrl = coverUrl ?: "",
             publishedYear = this.firstPublishYear ?: 0,
             totalPages = this.numberOfPages ?: 0,
             rating = this.ratingsAverage?.toFloat() ?: 0f,
-            addedAt = Date()
+            addedAt = System.currentTimeMillis()
         )
     }
 
@@ -93,11 +92,11 @@ class BookRepository(private val bookDao: BookDao) {
             author = "Unknown Author", // Will need to fetch author details separately
             description = description,
             genre = genre,
-            coverImageUrl = coverUrl,
+            coverImageUrl = coverUrl ?: "",
             publishedYear = this.firstPublishDate?.take(4)?.toIntOrNull() ?: 0,
             totalPages = 0,
             rating = 0f,
-            addedAt = Date()
+            addedAt = System.currentTimeMillis()
         )
     }
 
