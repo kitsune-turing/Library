@@ -53,4 +53,20 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.navigation.compose)
+
+    // Retrofit for API calls
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+
+    // OkHttp for networking
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Moshi for JSON parsing
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.codegen)
+
+    // Coil for image loading
+    implementation(libs.coil.compose)
 }

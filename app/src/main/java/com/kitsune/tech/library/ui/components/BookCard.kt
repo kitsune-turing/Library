@@ -9,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.kitsune.tech.library.data.database.Book
 import com.kitsune.tech.library.ui.theme.GoldLibrary
 
@@ -39,12 +41,21 @@ fun BookCard(
                     .height(240.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.MenuBook,
-                    contentDescription = "Book cover",
-                    modifier = Modifier.size(80.dp),
-                    tint = GoldLibrary
-                )
+                if (!book.coverImageUrl.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = book.coverImageUrl,
+                        contentDescription = "Book cover for ${book.title}",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Outlined.MenuBook,
+                        contentDescription = "Default book cover",
+                        modifier = Modifier.size(80.dp),
+                        tint = GoldLibrary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

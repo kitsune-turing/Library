@@ -46,7 +46,16 @@ fun HomeScreen(
         scope.launch {
             val user = userRepository.getUserById(userId)
             username = user?.username ?: "User"
-            recommendedBooks = bookRepository.getAllBooks().take(10)
+
+            // Try to get popular books from OpenLibrary API
+            val result = bookRepository.getPopularBooks(subject = "bestseller", limit = 20)
+            recommendedBooks = if (result.isSuccess) {
+                result.getOrNull() ?: emptyList()
+            } else {
+                // Fallback to local database if API fails
+                bookRepository.getAllBooks().take(10)
+            }
+
             isLoading = false
         }
     }
@@ -96,7 +105,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
-                            text = "LusternIcon",
+                            text = "AustenAlcott",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = GoldLibrary
@@ -114,17 +123,23 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    text = "Welcome Back,",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Text(
-                    text = username,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Welcome Back, ",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = username,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
