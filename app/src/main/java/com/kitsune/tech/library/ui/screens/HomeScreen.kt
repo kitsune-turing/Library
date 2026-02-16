@@ -22,6 +22,7 @@ import com.kitsune.tech.library.data.database.BookRepository
 import com.kitsune.tech.library.data.database.UserRepository
 import com.kitsune.tech.library.ui.components.BottomNavigationBar
 import com.kitsune.tech.library.ui.components.BookCard
+import com.kitsune.tech.library.ui.components.ErrorState
 import com.kitsune.tech.library.ui.theme.GoldLibrary
 import kotlinx.coroutines.launch
 
@@ -40,27 +41,45 @@ fun HomeScreen(
     var username by remember { mutableStateOf("") }
     var recommendedBooks by remember { mutableStateOf<List<Book>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(userId) {
+    fun loadBooks() {
         scope.launch {
+            isLoading = true
+            errorMessage = null
             val user = userRepository.getUserById(userId)
             username = user?.username ?: "User"
 
             // Try to get popular books from OpenLibrary API
             val result = bookRepository.getPopularBooks(subject = "bestseller", limit = 20)
-            recommendedBooks = if (result.isSuccess) {
-                result.getOrNull() ?: emptyList()
+            if (result.isSuccess) {
+                recommendedBooks = result.getOrNull() ?: emptyList()
             } else {
                 // Fallback to local database if API fails
-                bookRepository.getAllBooks().take(10)
+                recommendedBooks = bookRepository.getAllBooks().take(10)
+                if (recommendedBooks.isEmpty()) {
+                    errorMessage = "Failed to load books: ${result.exceptionOrNull()?.localizedMessage}"
+                } else {
+                    snackbarHostState.showSnackbar(
+                        message = "Showing offline content",
+                        actionLabel = "OK",
+                        duration = SnackbarDuration.Short
+                    )
+                }
             }
 
             isLoading = false
         }
     }
 
+    LaunchedEffect(userId) {
+        loadBooks()
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BottomNavigationBar(
                 currentRoute = "home",
@@ -71,16 +90,31 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-        } else {
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorState(
+                        message = errorMessage!!,
+                        onRetry = { loadBooks() }
+                    )
+                }
+            }
+            else -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()

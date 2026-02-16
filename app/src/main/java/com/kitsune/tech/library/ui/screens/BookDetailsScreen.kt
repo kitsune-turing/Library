@@ -10,7 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.kitsune.tech.library.data.database.Book
 import com.kitsune.tech.library.data.database.BookRepository
 import com.kitsune.tech.library.data.database.FavoriteRepository
@@ -101,12 +103,23 @@ fun BookDetailsScreen(
                         .height(300.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.MenuBook,
-                        contentDescription = "Book cover",
-                        modifier = Modifier.size(120.dp),
-                        tint = GoldLibrary
-                    )
+                    if (!book!!.coverImageUrl.isNullOrEmpty()) {
+                        AsyncImage(
+                            model = book!!.coverImageUrl,
+                            contentDescription = "Cover for ${book!!.title}",
+                            modifier = Modifier
+                                .height(300.dp)
+                                .width(200.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.MenuBook,
+                            contentDescription = "Book cover placeholder",
+                            modifier = Modifier.size(120.dp),
+                            tint = GoldLibrary
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

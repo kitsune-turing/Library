@@ -19,30 +19,48 @@ class BookRepository(private val bookDao: BookDao) {
     suspend fun searchBooks(query: String): List<Book> = bookDao.searchBooks(query)
 
     // API operations
-    suspend fun searchBooksFromApi(query: String, limit: Int = 20): Result<List<Book>> = withContext(Dispatchers.IO) {
+    suspend fun searchBooksFromApi(query: String, limit: Int = 20, persist: Boolean = true): Result<List<Book>> = withContext(Dispatchers.IO) {
         try {
             val response = api.searchBooks(query = query, limit = limit)
             val books = response.docs.mapNotNull { it.toBook() }
+
+            // Persist to local database for offline access
+            if (persist && books.isNotEmpty()) {
+                insertBooks(books)
+            }
+
             Result.success(books)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun getPopularBooks(subject: String = "fiction", limit: Int = 20): Result<List<Book>> = withContext(Dispatchers.IO) {
+    suspend fun getPopularBooks(subject: String = "fiction", limit: Int = 20, persist: Boolean = true): Result<List<Book>> = withContext(Dispatchers.IO) {
         try {
             val response = api.searchBooksBySubject(subject = subject, limit = limit)
             val books = response.docs.mapNotNull { it.toBook() }
+
+            // Persist to local database for offline access
+            if (persist && books.isNotEmpty()) {
+                insertBooks(books)
+            }
+
             Result.success(books)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun getBooksByAuthor(author: String, limit: Int = 20): Result<List<Book>> = withContext(Dispatchers.IO) {
+    suspend fun getBooksByAuthor(author: String, limit: Int = 20, persist: Boolean = true): Result<List<Book>> = withContext(Dispatchers.IO) {
         try {
             val response = api.searchBooksByAuthor(author = author, limit = limit)
             val books = response.docs.mapNotNull { it.toBook() }
+
+            // Persist to local database for offline access
+            if (persist && books.isNotEmpty()) {
+                insertBooks(books)
+            }
+
             Result.success(books)
         } catch (e: Exception) {
             Result.failure(e)

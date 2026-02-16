@@ -8,8 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.kitsune.tech.library.data.database.Book
 import com.kitsune.tech.library.ui.theme.GoldLibrary
 
@@ -38,12 +40,21 @@ fun BookListItem(
                     .size(80.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.MenuBook,
-                    contentDescription = "Book cover",
-                    modifier = Modifier.size(48.dp),
-                    tint = GoldLibrary
-                )
+                if (!book.coverImageUrl.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = book.coverImageUrl,
+                        contentDescription = "Cover for ${book.title}",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Outlined.MenuBook,
+                        contentDescription = "Book cover placeholder",
+                        modifier = Modifier.size(48.dp),
+                        tint = GoldLibrary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
