@@ -1,0 +1,18 @@
+package com.kitsune.tech.library.data.database
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "books")
+data class Book(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val title: String,
+    val author: String,
+    val description: String,
+    val genre: String,
+    val coverImageUrl: String = "",
+    val publishedYear: Int,
+    val totalPages: Int,
+    val rating: Float = 0f,
+    val addedAt: Long = System.currentTimeMillis()
+)
