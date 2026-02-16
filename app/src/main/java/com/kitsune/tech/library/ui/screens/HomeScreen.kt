@@ -1,10 +1,13 @@
 package com.kitsune.tech.library.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Search
@@ -12,9 +15,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.kitsune.tech.library.R
 import com.kitsune.tech.library.data.database.Book
@@ -23,6 +28,7 @@ import com.kitsune.tech.library.data.database.UserRepository
 import com.kitsune.tech.library.ui.components.BottomNavigationBar
 import com.kitsune.tech.library.ui.components.BookCard
 import com.kitsune.tech.library.ui.components.ErrorState
+import com.kitsune.tech.library.ui.components.FeaturedBookCard
 import com.kitsune.tech.library.ui.theme.GoldLibrary
 import kotlinx.coroutines.launch
 
@@ -115,111 +121,156 @@ fun HomeScreen(
                 }
             }
             else -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            contentDescription = "Logo",
-                            modifier = Modifier.size(40.dp),
-                            colorFilter = ColorFilter.tint(GoldLibrary)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = "AustenAlcott",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = GoldLibrary
-                        )
-                    }
-
-                    IconButton(onClick = { /* TODO: Notifications */ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "Notifications",
-                            tint = GoldLibrary
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Welcome Back, ",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = username,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(onClick = onNavigateToSearch),
-                    placeholder = { Text("Search") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Search,
-                            contentDescription = "Search"
-                        )
-                    },
-                    enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledBorderColor = MaterialTheme.colorScheme.outline,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Text(
-                    text = "BASED ON YOUR LAST READ",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = GoldLibrary,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        .fillMaxSize()
+                        .padding(paddingValues)
                 ) {
-                    items(recommendedBooks) { book ->
-                        BookCard(
-                            book = book,
-                            onViewDetails = { onNavigateToBookDetails(book.id) },
-                            onBookmark = { /* TODO: Toggle favorite */ },
-                            onAdd = { /* TODO: Add to reading history */ }
-                        )
+                    item {
+                        // Header
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp, vertical = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.logo),
+                                    contentDescription = "Logo",
+                                    modifier = Modifier.size(32.dp),
+                                    colorFilter = ColorFilter.tint(GoldLibrary)
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Text(
+                                    text = "AustenAlcott",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = GoldLibrary
+                                )
+                            }
+
+                            IconButton(onClick = { /* TODO: Notifications */ }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Notifications,
+                                    contentDescription = "Notifications",
+                                    tint = GoldLibrary
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+                        // Welcome message
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.Baseline,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Welcome Back, ",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = username,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Normal,
+                                    fontStyle = FontStyle.Italic,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+
+                    item {
+                        // Search bar
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                                .clip(RoundedCornerShape(28.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .clickable(onClick = onNavigateToSearch)
+                                .padding(horizontal = 20.dp, vertical = 16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Search,
+                                    contentDescription = "Search",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Search",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
+
+                    item {
+                        // Featured book card
+                        if (recommendedBooks.isNotEmpty()) {
+                            FeaturedBookCard(
+                                book = recommendedBooks.first(),
+                                onViewDetails = { onNavigateToBookDetails(recommendedBooks.first().id) },
+                                onBookmark = { /* TODO: Toggle favorite */ },
+                                onAdd = { /* TODO: Add to reading history */ },
+                                modifier = Modifier.padding(horizontal = 20.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(32.dp))
+                        }
+                    }
+
+                    if (recommendedBooks.size > 1) {
+                        item {
+                            Text(
+                                text = "More Recommendations",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 20.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        item {
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(recommendedBooks.drop(1)) { book ->
+                                    BookCard(
+                                        book = book,
+                                        onViewDetails = { onNavigateToBookDetails(book.id) },
+                                        onBookmark = { /* TODO: Toggle favorite */ },
+                                        onAdd = { /* TODO: Add to reading history */ },
+                                        modifier = Modifier.width(180.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
                     }
                 }
             }
